@@ -1,6 +1,7 @@
 """FastAPI application main entry point"""
 
 from contextlib import asynccontextmanager
+import os
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,11 +23,21 @@ settings = get_settings()
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown"""
     # Startup
-    print("[STARTUP] Initializing database...")
-    await init_db()
+    should_skip_startup = os.getenv("DISABLE_STARTUP_INIT") == "1" or settings.DATABASE_URL.startswith(
+        "sqlite"
+    )
+    if should_skip_startup:
+        print("[STARTUP] Skipping DB init (test/SQLite mode)")
+    else:
+        try:
+            print("[STARTUP] Initializing database...")
+            await init_db()
 
-    print("[STARTUP] Setting up pgvector...")
-    await setup_pgvector()
+            print("[STARTUP] Setting up pgvector...")
+            await setup_pgvector()
+        except Exception as exc:
+            # During tests/CI without Postgres, continue without startup DB init
+            print(f"[STARTUP] DB init skipped due to error: {exc}")
 
     print("[STARTUP] Application ready!")
 
