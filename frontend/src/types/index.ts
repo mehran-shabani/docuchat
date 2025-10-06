@@ -2,7 +2,7 @@ export interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
-  timestamp: Date;
+  timestamp: string; // ISO 8601 format
   streaming?: boolean;
 }
 
@@ -18,11 +18,10 @@ export interface ChatResponse {
   model?: string;
 }
 
-export interface WebSocketMessage {
-  type: 'token' | 'end' | 'error';
-  content?: string;
-  error?: string;
-}
+export type WebSocketMessage =
+  | { type: 'token'; content: string }
+  | { type: 'end' }
+  | { type: 'error'; error: string };
 
 export const ALLOWED_OPENAI_MODELS = [
   'gpt-3.5-turbo',

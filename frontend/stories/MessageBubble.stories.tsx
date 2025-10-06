@@ -19,7 +19,7 @@ export const UserMessage: Story = {
       id: '1',
       role: 'user',
       content: 'سلام! این یک پیام نمونه از کاربر است.',
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     },
   },
 };
@@ -30,7 +30,7 @@ export const AssistantMessage: Story = {
       id: '2',
       role: 'assistant',
       content: 'سلام! من دستیار هوشمند هستم. چطور می‌توانم به شما کمک کنم؟',
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     },
   },
 };
@@ -41,7 +41,7 @@ export const StreamingMessage: Story = {
       id: '3',
       role: 'assistant',
       content: 'در حال تایپ پاسخ...',
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       streaming: true,
     },
   },
@@ -61,7 +61,7 @@ export const LongMessage: Story = {
 • مدیریت خطوط جدید و فاصله‌ها
 
 این متن برای تست نمایش محتوای طولانی طراحی شده است.`,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     },
   },
 };

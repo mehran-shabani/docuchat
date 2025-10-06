@@ -12,6 +12,7 @@ export const useWsChat = (fallbackToHttp?: () => void) => {
   
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const shouldReconnectRef = useRef(true);
 
   const connect = useCallback(() => {
     if (!WS_ENABLED) {
@@ -20,6 +21,7 @@ export const useWsChat = (fallbackToHttp?: () => void) => {
     }
 
     try {
+      shouldReconnectRef.current = true;
       const ws = new WebSocket(WS_ENDPOINT);
       wsRef.current = ws;
 
@@ -33,7 +35,7 @@ export const useWsChat = (fallbackToHttp?: () => void) => {
         try {
           const data: WebSocketMessage = JSON.parse(event.data);
 
-          if (data.type === 'token' && data.content) {
+          if (data.type === 'token') {
             // Update streaming message
             setMessages(prev => {
               const lastMessage = prev[prev.length - 1];
@@ -65,7 +67,7 @@ export const useWsChat = (fallbackToHttp?: () => void) => {
             });
             setIsLoading(false);
           } else if (data.type === 'error') {
-            setError(data.error || 'خطای نامشخص');
+            setError(data.error);
             setIsLoading(false);
           }
         } catch (err) {
@@ -83,12 +85,14 @@ export const useWsChat = (fallbackToHttp?: () => void) => {
         console.log('WebSocket قطع شد');
         setIsConnected(false);
         
-        // Auto reconnect after 3 seconds
-        reconnectTimeoutRef.current = setTimeout(() => {
-          if (WS_ENABLED) {
-            connect();
-          }
-        }, 3000);
+        // Auto reconnect only if not manually disconnected
+        if (shouldReconnectRef.current) {
+          reconnectTimeoutRef.current = setTimeout(() => {
+            if (WS_ENABLED) {
+              connect();
+            }
+          }, 3000);
+        }
       };
     } catch (err) {
       console.error('خطا در ایجاد WebSocket:', err);
@@ -102,6 +106,7 @@ export const useWsChat = (fallbackToHttp?: () => void) => {
   }, [fallbackToHttp]);
 
   const disconnect = useCallback(() => {
+    shouldReconnectRef.current = false;
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
     }
@@ -127,14 +132,14 @@ export const useWsChat = (fallbackToHttp?: () => void) => {
       id: Date.now().toString(),
       role: 'user',
       content: text,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
 
     const streamingMessage: Message = {
       id: (Date.now() + 1).toString(),
       role: 'assistant',
       content: '',
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       streaming: true,
     };
 

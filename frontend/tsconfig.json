@@ -18,6 +18,6 @@
     },
     "types": ["vitest/globals"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".storybook/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".storybook/*.ts", ".storybook/*.tsx"],
   "exclude": ["node_modules"]
 }

@@ -15,7 +15,7 @@ export const useHttpChat = () => {
       id: Date.now().toString(),
       role: 'user',
       content: text,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -46,7 +46,7 @@ export const useHttpChat = () => {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: data.response,
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -58,7 +58,7 @@ export const useHttpChat = () => {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: `خطا: ${errorMessage}`,
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
       };
       
       setMessages(prev => [...prev, errorMsg]);

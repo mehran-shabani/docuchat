@@ -37,11 +37,13 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
             <span className="inline-block w-1 h-4 bg-current ml-1 animate-pulse" />
           )}
         </div>
-        <div className="text-xs opacity-60 mt-2 text-left" dir="ltr">
-          {message.timestamp.toLocaleTimeString('fa-IR', {
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
+        <div className="text-xs opacity-60 mt-2 text-left">
+          <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>
+            {new Date(message.timestamp).toLocaleTimeString('fa-IR', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
         </div>
       </div>
     </div>

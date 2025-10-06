@@ -9,7 +9,7 @@ describe('MessageBubble', () => {
       id: '1',
       role: 'user',
       content: 'سلام',
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
 
     render(<MessageBubble message={message} />);
@@ -22,7 +22,7 @@ describe('MessageBubble', () => {
       id: '2',
       role: 'assistant',
       content: 'سلام! چطور می‌توانم کمکتان کنم؟',
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
 
     render(<MessageBubble message={message} />);
@@ -35,7 +35,7 @@ describe('MessageBubble', () => {
       id: '3',
       role: 'assistant',
       content: 'در حال پاسخ...',
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       streaming: true,
     };
 
@@ -48,7 +48,7 @@ describe('MessageBubble', () => {
       id: '4',
       role: 'user',
       content: 'تست RTL',
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
 
     const { container } = render(<MessageBubble message={message} />);

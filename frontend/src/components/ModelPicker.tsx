@@ -7,29 +7,46 @@ interface ModelPickerProps {
   currentModel?: OpenAIModel;
 }
 
+const resolveModel = (value?: string | null): OpenAIModel => {
+  const allowed: string[] = [...ALLOWED_OPENAI_MODELS];
+  return value && allowed.includes(value)
+    ? (value as OpenAIModel)
+    : 'gpt-3.5-turbo';
+};
+
 export const ModelPicker: React.FC<ModelPickerProps> = ({
   onModelChange,
   currentModel,
 }) => {
   const [selectedModel, setSelectedModel] = useState<OpenAIModel>(
-    currentModel || (process.env.NEXT_PUBLIC_OPENAI_MODEL as OpenAIModel) || 'gpt-3.5-turbo'
+    resolveModel(currentModel ?? process.env.NEXT_PUBLIC_OPENAI_MODEL)
   );
   const [availableModels, setAvailableModels] = useState<OpenAIModel[]>([]);
 
   useEffect(() => {
     // Parse available models from environment variable
     const modelOptions = process.env.NEXT_PUBLIC_MODEL_OPTIONS || 'gpt-3.5-turbo,gpt-4o,gpt-4o-mini';
+    const allowed: string[] = [...ALLOWED_OPENAI_MODELS];
     const models = modelOptions
       .split(',')
       .map(m => m.trim())
-      .filter(m => ALLOWED_OPENAI_MODELS.includes(m as OpenAIModel)) as OpenAIModel[];
+      .filter(m => allowed.includes(m)) as OpenAIModel[];
 
-    setAvailableModels(models.length > 0 ? models : ['gpt-3.5-turbo']);
+    const safeModels: OpenAIModel[] = models.length > 0 ? models : ['gpt-3.5-turbo'];
+    setAvailableModels(safeModels);
+    setSelectedModel(prev => (safeModels.includes(prev) ? prev : safeModels[0]));
   }, []);
+
+  useEffect(() => {
+    if (currentModel) {
+      setSelectedModel(resolveModel(currentModel));
+    }
+  }, [currentModel]);
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const model = event.target.value as OpenAIModel;
-    if (ALLOWED_OPENAI_MODELS.includes(model)) {
+    const allowed: string[] = [...ALLOWED_OPENAI_MODELS];
+    if (allowed.includes(model)) {
       setSelectedModel(model);
       onModelChange(model);
     }

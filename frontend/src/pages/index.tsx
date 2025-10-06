@@ -16,7 +16,7 @@ export default function Home() {
         </p>
         
         <p className="text-gray-500 mb-8">
-          دستیار هوشمند مکالمه با اسناد شما
+          {t('description')}
         </p>
 
         <Link
@@ -28,17 +28,17 @@ export default function Home() {
 
         <div className="mt-8 pt-6 border-t border-gray-200">
           <p className="text-sm text-gray-500">
-            {t('version')} 0.1.0
+            {t('version')} {process.env.NEXT_PUBLIC_APP_VERSION || '0.1.0'}
           </p>
           <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-400">
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-              بک‌اند فعال
+              {t('backendActive')}
             </span>
             <span>•</span>
-            <span>فقط مدل‌های OpenAI</span>
+            <span>{t('openaiOnly')}</span>
             <span>•</span>
-            <span>RTL فارسی</span>
+            <span>{t('rtlPersian')}</span>
           </div>
         </div>
       </div>
