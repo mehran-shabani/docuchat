@@ -46,12 +46,7 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - backend
-    # For development, use volume mount
-    # volumes:
-    #   - ../frontend:/app
-    #   - /app/node_modules
-    #   - /app/.next
+      - backend  # For development, you can mount volumes; see README
 
 volumes:
   postgres_data:

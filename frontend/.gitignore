@@ -35,3 +35,6 @@ next-env.d.ts
 
 # storybook
 storybook-static
+
+# allow library code under src/lib
+!src/lib/
