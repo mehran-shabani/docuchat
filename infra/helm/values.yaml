@@ -5,11 +5,11 @@ backend:
     repository: ghcr.io/your-org/docuchat-backend
     pullPolicy: IfNotPresent
     tag: "0.1.0"
-  
+
   service:
     type: ClusterIP
     port: 8000
-  
+
   env:
     - name: DATABASE_URL
       valueFrom:
@@ -27,7 +27,7 @@ frontend:
     repository: ghcr.io/your-org/docuchat-frontend
     pullPolicy: IfNotPresent
     tag: "0.1.0"
-  
+
   service:
     type: LoadBalancer
     port: 3000
