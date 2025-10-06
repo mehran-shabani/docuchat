@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "docuchat.fullname" . }}-frontend
+  labels:
+    {{- include "docuchat.frontend.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.frontend.enabled }}
+  replicas: {{ .Values.replicaCount.frontend }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "docuchat.frontend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "docuchat.frontend.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: frontend
+        image: "{{ .Values.image.frontend.repository }}:{{ .Values.image.frontend.tag }}"
+        imagePullPolicy: {{ .Values.image.frontend.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        env:
+        - name: NEXT_PUBLIC_API_URL
+          value: "https://{{ (index .Values.ingress.hosts 0).host }}"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          {{- toYaml .Values.resources.frontend | nindent 12 }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

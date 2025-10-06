@@ -1,0 +1,127 @@
+groups:
+  - name: docuchat_alerts
+    interval: 30s
+    rules:
+      # High error rate
+      - alert: HighErrorRate
+        expr: |
+          rate(http_request_duration_seconds_count{status=~"5.."}[5m]) 
+          / 
+          rate(http_request_duration_seconds_count[5m]) 
+          > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          service: docuchat
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} for {{ $labels.instance }}"
+
+      # High latency
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95, 
+            rate(http_request_duration_seconds_bucket[5m])
+          ) > 2.0
+        for: 5m
+        labels:
+          severity: warning
+          service: docuchat
+        annotations:
+          summary: "High latency detected"
+          description: "P95 latency is {{ $value }}s for {{ $labels.endpoint }}"
+
+      # OpenAI API failures
+      - alert: OpenAIHighFailureRate
+        expr: |
+          rate(openai_request_total{status!="success"}[5m]) 
+          / 
+          rate(openai_request_total[5m]) 
+          > 0.10
+        for: 5m
+        labels:
+          severity: critical
+          service: docuchat
+        annotations:
+          summary: "High OpenAI API failure rate"
+          description: "OpenAI failure rate is {{ $value | humanizePercentage }} for tenant {{ $labels.tenant }}"
+
+      # Excessive ML fallbacks
+      - alert: ExcessiveMLFallbacks
+        expr: rate(ml_fallback_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: docuchat
+        annotations:
+          summary: "Excessive ML model fallbacks"
+          description: "Fallback rate is {{ $value }}/s from {{ $labels.from_model }} to {{ $labels.to_model }}"
+
+      # Pod down
+      - alert: PodDown
+        expr: up{job="docuchat-backend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: docuchat
+        annotations:
+          summary: "DocuChat pod is down"
+          description: "Pod {{ $labels.instance }} has been down for more than 2 minutes"
+
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: |
+          (container_memory_usage_bytes{pod=~"docuchat-.*"} 
+          / 
+          container_spec_memory_limit_bytes{pod=~"docuchat-.*"}) 
+          > 0.90
+        for: 5m
+        labels:
+          severity: warning
+          service: docuchat
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value | humanizePercentage }} for {{ $labels.pod }}"
+
+      # High CPU usage
+      - alert: HighCPUUsage
+        expr: |
+          rate(container_cpu_usage_seconds_total{pod=~"docuchat-.*"}[5m]) 
+          / 
+          container_spec_cpu_quota{pod=~"docuchat-.*"} 
+          * 100000 
+          > 90
+        for: 5m
+        labels:
+          severity: warning
+          service: docuchat
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}% for {{ $labels.pod }}"
+
+      # Unusual token consumption spike
+      - alert: TokenConsumptionSpike
+        expr: |
+          rate(openai_tokens_total[5m]) 
+          > 
+          (avg_over_time(rate(openai_tokens_total[5m])[1h:5m]) * 3)
+        for: 10m
+        labels:
+          severity: warning
+          service: docuchat
+        annotations:
+          summary: "Unusual token consumption spike"
+          description: "Token consumption is 3x higher than usual for tenant {{ $labels.tenant }}"
+
+      # Database connection issues
+      - alert: DatabaseConnectionErrors
+        expr: |
+          rate(http_request_duration_seconds_count{status="500",endpoint=~".*database.*"}[5m]) 
+          > 0.1
+        for: 3m
+        labels:
+          severity: critical
+          service: docuchat
+        annotations:
+          summary: "Database connection errors detected"
+          description: "Database errors at {{ $value }}/s"

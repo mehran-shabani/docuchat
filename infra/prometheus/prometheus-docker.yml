@@ -1,0 +1,24 @@
+global:
+  scrape_interval: 30s
+  scrape_timeout: 10s
+  evaluation_interval: 30s
+  external_labels:
+    cluster: 'docuchat-local'
+    environment: 'development'
+
+# Scrape configurations for docker-compose
+scrape_configs:
+  # DocuChat Backend
+  - job_name: 'docuchat-backend'
+    static_configs:
+      - targets: ['backend:8000']
+        labels:
+          service: 'backend'
+          environment: 'development'
+    metrics_path: /api/v1/metrics
+    scrape_interval: 15s
+
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

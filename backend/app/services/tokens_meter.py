@@ -5,14 +5,20 @@ from datetime import datetime, timedelta
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.routes.metrics import openai_tokens_total
 from app.models.quota import Quota
 
 
 async def record_token_usage(
-    session: AsyncSession, tenant_id: int, user_id: int, tokens_in: int, tokens_out: int
+    session: AsyncSession,
+    tenant_id: int,
+    user_id: int,
+    tokens_in: int,
+    tokens_out: int,
+    model: str = "gpt-4o-mini",
 ) -> None:
     """
-    Record token usage in quota table
+    Record token usage in quota table and Prometheus metrics
 
     Args:
         session: Database session
@@ -20,6 +26,7 @@ async def record_token_usage(
         user_id: User ID
         tokens_in: Input tokens count
         tokens_out: Output tokens count
+        model: OpenAI model name
     """
     quota = Quota(
         tenant_id=tenant_id,
@@ -31,6 +38,13 @@ async def record_token_usage(
 
     session.add(quota)
     await session.commit()
+
+    # Record metrics for Prometheus
+    tenant_str = str(tenant_id)
+    openai_tokens_total.labels(tenant=tenant_str, direction="in", model=model).inc(tokens_in)
+    openai_tokens_total.labels(tenant=tenant_str, direction="out", model=model).inc(
+        tokens_out
+    )
 
 
 async def get_usage_stats(session: AsyncSession, tenant_id: int, user_id: int) -> dict:

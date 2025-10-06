@@ -13,6 +13,7 @@ from app.api.routes import api_router
 from app.core.config import get_settings
 from app.db.init import setup_pgvector
 from app.db.session import init_db
+from app.middleware.metrics import MetricsMiddleware
 from app.services.ratelimit import limiter
 from app.ws.chat import websocket_chat_handler
 
@@ -67,6 +68,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Metrics middleware
+app.add_middleware(MetricsMiddleware)
 
 
 # Exception handlers

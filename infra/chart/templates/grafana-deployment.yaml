@@ -1,0 +1,157 @@
+{{- if .Values.grafana.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "docuchat.fullname" . }}-grafana-datasources
+  labels:
+    {{- include "docuchat.labels" . | nindent 4 }}
+data:
+  datasources.yaml: |
+{{ .Files.Get "../../grafana/datasources.yaml" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "docuchat.fullname" . }}-grafana-dashboards
+  labels:
+    {{- include "docuchat.labels" . | nindent 4 }}
+data:
+  backend-overview.json: |
+{{ .Files.Get "../../grafana/dashboards/backend-overview.json" | indent 4 }}
+  token-usage.json: |
+{{ .Files.Get "../../grafana/dashboards/token-usage.json" | indent 4 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "docuchat.fullname" . }}-grafana
+  labels:
+    {{- include "docuchat.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "docuchat.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: grafana
+  template:
+    metadata:
+      labels:
+        {{- include "docuchat.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: grafana
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: grafana
+        image: grafana/grafana:latest
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        env:
+        - name: GF_SECURITY_ADMIN_USER
+          value: {{ .Values.grafana.adminUser }}
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "docuchat.fullname" . }}-secrets
+              key: GRAFANA_ADMIN_PASSWORD
+        - name: GF_USERS_ALLOW_SIGN_UP
+          value: "false"
+        - name: GF_INSTALL_PLUGINS
+          value: ""
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: datasources
+          mountPath: /etc/grafana/provisioning/datasources
+        - name: dashboards-config
+          mountPath: /etc/grafana/provisioning/dashboards
+        - name: dashboards
+          mountPath: /var/lib/grafana/dashboards
+        - name: storage
+          mountPath: /var/lib/grafana
+        resources:
+          {{- toYaml .Values.resources.grafana | nindent 12 }}
+      volumes:
+      - name: datasources
+        configMap:
+          name: {{ include "docuchat.fullname" . }}-grafana-datasources
+      - name: dashboards-config
+        configMap:
+          name: {{ include "docuchat.fullname" . }}-grafana-dashboard-config
+      - name: dashboards
+        configMap:
+          name: {{ include "docuchat.fullname" . }}-grafana-dashboards
+      - name: storage
+        {{- if .Values.grafana.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ include "docuchat.fullname" . }}-grafana-storage
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "docuchat.fullname" . }}-grafana-dashboard-config
+  labels:
+    {{- include "docuchat.labels" . | nindent 4 }}
+data:
+  dashboards.yaml: |
+    apiVersion: 1
+    providers:
+    - name: 'default'
+      orgId: 1
+      folder: ''
+      type: file
+      disableDeletion: false
+      updateIntervalSeconds: 10
+      allowUiUpdates: true
+      options:
+        path: /var/lib/grafana/dashboards
+---
+{{- if .Values.grafana.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "docuchat.fullname" . }}-grafana-storage
+  labels:
+    {{- include "docuchat.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.grafana.persistence.size }}
+{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "docuchat.fullname" . }}-grafana
+  labels:
+    {{- include "docuchat.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3000
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "docuchat.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+{{- end }}

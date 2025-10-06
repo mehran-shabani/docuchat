@@ -1,0 +1,67 @@
+{{- if .Values.billing.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "docuchat.fullname" . }}-billing
+  labels:
+    {{- include "docuchat.labels" . | nindent 4 }}
+    app.kubernetes.io/component: billing
+spec:
+  schedule: {{ .Values.billing.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "docuchat.labels" . | nindent 8 }}
+        app.kubernetes.io/component: billing
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "docuchat.labels" . | nindent 12 }}
+            app.kubernetes.io/component: billing
+        spec:
+          restartPolicy: OnFailure
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          containers:
+          - name: billing
+            image: "{{ .Values.billing.image.repository }}:{{ .Values.billing.image.tag }}"
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - |
+              pip install requests prometheus-api-client psycopg2-binary --quiet
+              python /scripts/billing.py
+            env:
+            - name: PROMETHEUS_URL
+              value: "http://{{ include "docuchat.fullname" . }}-prometheus:9090"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "docuchat.fullname" . }}-secrets
+                  key: DATABASE_URL
+            - name: ZIBAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "docuchat.fullname" . }}-secrets
+                  key: ZIBAL_API_KEY
+            volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+            resources:
+              {{- toYaml .Values.billing.resources | nindent 14 }}
+            securityContext:
+              {{- toYaml .Values.securityContext | nindent 14 }}
+          volumes:
+          - name: scripts
+            configMap:
+              name: {{ include "docuchat.fullname" . }}-billing-scripts
+{{- end }}
