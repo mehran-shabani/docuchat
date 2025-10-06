@@ -75,25 +75,31 @@ The API will be available at `http://localhost:8000`
 ## API Documentation
 
 Once running, visit:
+
 - Swagger UI: `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
 
 ## API Endpoints
 
 ### Authentication
+
 - `POST /v1/auth/request-code` - Request verification code
 - `POST /v1/auth/verify-code` - Verify code and get JWT token
 
 ### Files
+
 - `POST /v1/files` - Upload PDF file (requires auth)
 
 ### Chat
+
 - `WS /ws/chat` - WebSocket endpoint for chat with streaming
 
 ### Usage
+
 - `GET /v1/usage` - Get token usage statistics (requires auth)
 
 ### Health
+
 - `GET /healthz` - Health check
 
 ## Multi-tenancy
@@ -107,6 +113,7 @@ curl -H "X-Tenant-ID: 1" http://localhost:8000/healthz
 ## Authentication Flow
 
 1. Request verification code:
+
 ```bash
 curl -X POST http://localhost:8000/v1/auth/request-code \
   -H "X-Tenant-ID: 1" \
@@ -117,6 +124,7 @@ curl -X POST http://localhost:8000/v1/auth/request-code \
 2. Check server logs for the code (in production, this would be sent via email)
 
 3. Verify code:
+
 ```bash
 curl -X POST http://localhost:8000/v1/auth/verify-code \
   -H "X-Tenant-ID: 1" \
@@ -125,6 +133,7 @@ curl -X POST http://localhost:8000/v1/auth/verify-code \
 ```
 
 4. Use the returned JWT token in subsequent requests:
+
 ```bash
 curl http://localhost:8000/v1/usage \
   -H "X-Tenant-ID: 1" \
@@ -148,7 +157,7 @@ pytest tests/test_auth.py
 
 ### Project Structure
 
-```
+```text
 app/
 ├── main.py              # Application entry point
 ├── core/                # Core configuration
@@ -175,6 +184,7 @@ ruff check .
 See `.env.example` for all available configuration options.
 
 Key variables:
+
 - `DATABASE_URL` - PostgreSQL connection string
 - `REDIS_URL` - Redis connection string
 - `OPENAI_API_KEY` - Your OpenAI API key
@@ -190,6 +200,7 @@ Key variables:
 4. Use connection pooling for database
 5. Enable Redis persistence
 6. Run with multiple workers:
+
    ```bash
    uvicorn app.main:app --workers 4 --host 0.0.0.0 --port 8000
    ```
@@ -201,4 +212,5 @@ See LICENSE file in the root directory.
 ## Documentation
 
 For detailed setup and usage instructions in Persian, see:
+
 - [راهنمای سریع فارسی](../docs/fa/backend-quickstart.md)
