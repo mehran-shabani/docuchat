@@ -6,7 +6,6 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import create_access_token
 from app.models.tenant import Tenant
 from app.models.user import User
 
@@ -22,7 +21,7 @@ async def test_upload_pdf_unauthorized(client: AsyncClient, tenant_headers: dict
 
 @pytest.mark.asyncio
 async def test_upload_invalid_file_type(
-    client: AsyncClient, db_session: AsyncSession, tenant_headers: dict
+    authenticated_client: AsyncClient, db_session: AsyncSession, tenant_headers: dict
 ):
     """Test upload with non-PDF file"""
     # Create tenant and user
@@ -34,14 +33,10 @@ async def test_upload_invalid_file_type(
     db_session.add(user)
     await db_session.commit()
 
-    # Create token
-    token = create_access_token({"sub": 1, "tenant_id": 1})
-
-    # Try to upload non-PDF
+    # Try to upload non-PDF (authentication is mocked in fixture)
     files = {"file": ("test.txt", BytesIO(b"test content"), "text/plain")}
-    headers = {**tenant_headers, "Authorization": f"Bearer {token}"}
 
-    response = await client.post("/v1/files", files=files, headers=headers)
+    response = await authenticated_client.post("/v1/files", files=files, headers=tenant_headers)
 
     assert response.status_code == 400
     assert "PDF" in response.json()["detail"]

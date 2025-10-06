@@ -119,12 +119,35 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
 
 @pytest_asyncio.fixture
 async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
-    """Provide a test HTTP client"""
+    """Provide a test HTTP client without authentication override"""
 
     async def override_get_session():
         yield db_session
 
     app.dependency_overrides[get_session] = override_get_session
+
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        yield ac
+
+    app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture
+async def authenticated_client(
+    db_session: AsyncSession,
+) -> AsyncGenerator[AsyncClient, None]:
+    """Provide a test HTTP client with mocked authentication"""
+    from app.api.deps import get_current_user
+
+    async def override_get_session():
+        yield db_session
+
+    # Mock get_current_user to bypass authentication
+    async def override_get_current_user():
+        return {"user_id": 1, "tenant_id": 1}
+
+    app.dependency_overrides[get_session] = override_get_session
+    app.dependency_overrides[get_current_user] = override_get_current_user
 
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac

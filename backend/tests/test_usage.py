@@ -4,7 +4,6 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import create_access_token
 from app.models.quota import Quota
 from app.models.tenant import Tenant
 from app.models.user import User
@@ -19,7 +18,9 @@ async def test_get_usage_unauthorized(client: AsyncClient, tenant_headers: dict)
 
 
 @pytest.mark.asyncio
-async def test_get_usage_empty(client: AsyncClient, db_session: AsyncSession, tenant_headers: dict):
+async def test_get_usage_empty(
+    authenticated_client: AsyncClient, db_session: AsyncSession, tenant_headers: dict
+):
     """Test getting usage with no data"""
     # Create tenant and user
     tenant = Tenant(id=1, name="test")
@@ -30,12 +31,7 @@ async def test_get_usage_empty(client: AsyncClient, db_session: AsyncSession, te
     db_session.add(user)
     await db_session.commit()
 
-    # Create token
-    token = create_access_token({"sub": 1, "tenant_id": 1})
-
-    headers = {**tenant_headers, "Authorization": f"Bearer {token}"}
-
-    response = await client.get("/v1/usage", headers=headers)
+    response = await authenticated_client.get("/v1/usage", headers=tenant_headers)
 
     assert response.status_code == 200
     data = response.json()
@@ -47,7 +43,7 @@ async def test_get_usage_empty(client: AsyncClient, db_session: AsyncSession, te
 
 @pytest.mark.asyncio
 async def test_get_usage_with_data(
-    client: AsyncClient, db_session: AsyncSession, tenant_headers: dict
+    authenticated_client: AsyncClient, db_session: AsyncSession, tenant_headers: dict
 ):
     """Test getting usage with some data"""
     # Create tenant and user
@@ -64,12 +60,7 @@ async def test_get_usage_with_data(
     db_session.add(quota)
     await db_session.commit()
 
-    # Create token
-    token = create_access_token({"sub": 1, "tenant_id": 1})
-
-    headers = {**tenant_headers, "Authorization": f"Bearer {token}"}
-
-    response = await client.get("/v1/usage", headers=headers)
+    response = await authenticated_client.get("/v1/usage", headers=tenant_headers)
 
     assert response.status_code == 200
     data = response.json()
