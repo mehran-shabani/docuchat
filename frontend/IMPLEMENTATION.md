@@ -6,7 +6,7 @@
 
 ### معماری کلی
 
-```
+```text
 Frontend (Next.js 14 + React 18 + Tailwind)
     ↓
 HTTP /v1/chat/demo (پیش‌فرض)
@@ -17,7 +17,7 @@ Backend (FastAPI - از پرامپت ۱)
 
 ## 📁 ساختار پروژه
 
-```
+```text
 frontend/
 ├── src/
 │   ├── pages/                   # صفحات Next.js
@@ -154,13 +154,14 @@ ENABLE_TEAM_SHARING=false       # برای آینده
 
 ## 📊 نتایج تست
 
-```
+```text
 Test Files: 6 passed (6)
 Tests: 23 passed (23)
 Duration: ~3.67s
 ```
 
 **تست‌های اصلی:**
+
 1. رندر MessageBubble در RTL
 2. نمایش user/assistant messages
 3. نشانگر streaming
@@ -177,12 +178,14 @@ Duration: ~3.67s
 ## 🎨 ویژگی‌های UI
 
 ### طراحی
+
 - Gradient background (blue to indigo)
 - Shadow و rounded corners مدرن
 - رنگ‌بندی: Indigo (primary), White/Gray (backgrounds)
 - انیمیشن‌های smooth (hover, pulse)
 
 ### تجربه کاربری
+
 - Placeholder فارسی
 - لودینگ state با متن فارسی
 - پیام‌های خطا با RTL
@@ -191,6 +194,7 @@ Duration: ~3.67s
 - Disable button در حالت loading
 
 ### Accessibility
+
 - Semantic HTML
 - ARIA labels
 - Keyboard navigation
@@ -209,7 +213,7 @@ pnpm dev
 
 ## 📝 نکات برای ایجنت بعدی (بک‌اند)
 
-### الزامات برای ایجنت ۳ (بک‌اند):
+### الزامات برای ایجنت ۳ (بک‌اند)
 
 1. **مسیرهای موجود:**
    - `GET /healthz` ✓

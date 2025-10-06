@@ -27,17 +27,20 @@ This document outlines the translation strategy for DocuChat documentation from 
 ## Translation Guidelines
 
 ### Style Guide
+
 1. **Tone**: Professional, clear, and concise
 2. **Technical Terms**: Keep technical terms in English with Persian explanation in parentheses on first use
 3. **Code Examples**: Keep code unchanged, translate only comments and explanations
 4. **Formatting**: Maintain consistent formatting between English and Persian versions
 
 ### RTL (Right-to-Left) Considerations
+
 - Ensure proper RTL layout in Persian documents
 - Use appropriate Unicode characters for Persian text
 - Test rendering in both LTR and RTL contexts
 
 ### Quality Assurance
+
 - Technical review by bilingual developers
 - Consistency check across all documents
 - Link validation in both language versions
@@ -70,4 +73,4 @@ This document outlines the translation strategy for DocuChat documentation from 
 
 ## Contact
 
-For translation inquiries or to volunteer as a translator, please contact the documentation team at docs@docuchat.example.com
+For translation inquiries or to volunteer as a translator, please contact the documentation team at <docs@docuchat.example.com>

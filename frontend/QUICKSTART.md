@@ -73,12 +73,14 @@ pnpm start
 ## Feature Flags
 
 ### WebSocket Streaming
+
 ```env
 NEXT_PUBLIC_ENABLE_WS=true
 NEXT_PUBLIC_WS_ENDPOINT=ws://localhost:8000/ws/chat
 ```
 
 ### آپلود PDF (برای آینده)
+
 ```env
 ENABLE_PDF_UPLOAD=true
 ```

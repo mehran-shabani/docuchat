@@ -80,7 +80,7 @@ pnpm start
 
 ## ساختار پروژه
 
-```
+```text
 frontend/
 ├── src/
 │   ├── pages/              # صفحات Next.js
@@ -128,10 +128,12 @@ frontend/
 ### حالت‌های ارتباط
 
 **HTTP (پیش‌فرض):**
+
 - ارسال پیام به `/v1/chat/demo`
 - دریافت پاسخ کامل
 
 **WebSocket (اختیاری):**
+
 - فعال با `NEXT_PUBLIC_ENABLE_WS=true`
 - استریم token-by-token از `/ws/chat`
 - Fallback خودکار به HTTP در صورت خطا
