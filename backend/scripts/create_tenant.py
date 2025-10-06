@@ -13,9 +13,7 @@ async def create_default_tenant():
     """Create default tenant if it doesn't exist"""
     async with async_session_maker() as session:
         # Check if default tenant exists
-        result = await session.execute(
-            select(Tenant).where(Tenant.name == "default")
-        )
+        result = await session.execute(select(Tenant).where(Tenant.name == "default"))
         tenant = result.scalar_one_or_none()
 
         if tenant:

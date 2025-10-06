@@ -9,11 +9,7 @@ from app.models.quota import Quota
 
 
 async def record_token_usage(
-    session: AsyncSession,
-    tenant_id: int,
-    user_id: int,
-    tokens_in: int,
-    tokens_out: int
+    session: AsyncSession, tenant_id: int, user_id: int, tokens_in: int, tokens_out: int
 ) -> None:
     """
     Record token usage in quota table
@@ -30,18 +26,14 @@ async def record_token_usage(
         user_id=user_id,
         tokens_in=tokens_in,
         tokens_out=tokens_out,
-        timestamp=datetime.utcnow()
+        timestamp=datetime.utcnow(),
     )
 
     session.add(quota)
     await session.commit()
 
 
-async def get_usage_stats(
-    session: AsyncSession,
-    tenant_id: int,
-    user_id: int
-) -> dict:
+async def get_usage_stats(session: AsyncSession, tenant_id: int, user_id: int) -> dict:
     """
     Get usage statistics for a user
 
@@ -61,7 +53,7 @@ async def get_usage_stats(
     result_24h = await session.execute(
         select(
             func.sum(Quota.tokens_in).label("tokens_in"),
-            func.sum(Quota.tokens_out).label("tokens_out")
+            func.sum(Quota.tokens_out).label("tokens_out"),
         )
         .where(Quota.tenant_id == tenant_id)
         .where(Quota.user_id == user_id)
@@ -74,7 +66,7 @@ async def get_usage_stats(
     result_7d = await session.execute(
         select(
             func.sum(Quota.tokens_in).label("tokens_in"),
-            func.sum(Quota.tokens_out).label("tokens_out")
+            func.sum(Quota.tokens_out).label("tokens_out"),
         )
         .where(Quota.tenant_id == tenant_id)
         .where(Quota.user_id == user_id)
@@ -84,12 +76,6 @@ async def get_usage_stats(
     row_7d = result_7d.first()
 
     return {
-        "window_24h": {
-            "tokens_in": row_24h[0] or 0,
-            "tokens_out": row_24h[1] or 0
-        },
-        "window_7d": {
-            "tokens_in": row_7d[0] or 0,
-            "tokens_out": row_7d[1] or 0
-        }
+        "window_24h": {"tokens_in": row_24h[0] or 0, "tokens_out": row_24h[1] or 0},
+        "window_7d": {"tokens_in": row_7d[0] or 0, "tokens_out": row_7d[1] or 0},
     }

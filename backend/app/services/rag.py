@@ -9,9 +9,7 @@ settings = get_settings()
 
 
 def build_rag_prompt(
-    user_question: str,
-    retrieved_chunks: List[Tuple[str, int, str]],
-    max_tokens: int = None
+    user_question: str, retrieved_chunks: List[Tuple[str, int, str]], max_tokens: int = None
 ) -> Tuple[str, str]:
     """
     Build system and user prompts for RAG
@@ -36,7 +34,9 @@ def build_rag_prompt(
         chunk_tokens = count_tokens(chunk_context)
 
         # Check if adding this chunk exceeds max tokens
-        if current_tokens + chunk_tokens > max_tokens * 0.7:  # Reserve 30% for question and system prompt
+        if (
+            current_tokens + chunk_tokens > max_tokens * 0.7
+        ):  # Reserve 30% for question and system prompt
             break
 
         context_parts.append(chunk_context)

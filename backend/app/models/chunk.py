@@ -15,10 +15,7 @@ class Chunk(SQLModel, table=True):
     document_id: int = Field(foreign_key="documents.id", index=True)
     page: int
     text: str = Field(max_length=5000)
-    embedding: Optional[List[float]] = Field(
-        default=None,
-        sa_column=Column(Vector(1536))
-    )
+    embedding: Optional[List[float]] = Field(default=None, sa_column=Column(Vector(1536)))
 
     class Config:
         arbitrary_types_allowed = True

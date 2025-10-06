@@ -27,6 +27,7 @@ async def extract_text_from_pdf(pdf_bytes: bytes) -> List[Tuple[int, str]]:
 
         # Check page limit
         from app.core.config import get_settings
+
         settings = get_settings()
 
         if num_pages > settings.MAX_PDF_PAGES:

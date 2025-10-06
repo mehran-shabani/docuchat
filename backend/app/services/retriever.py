@@ -12,10 +12,7 @@ settings = get_settings()
 
 
 async def retrieve_relevant_chunks(
-    query: str,
-    tenant_id: int,
-    session: AsyncSession,
-    top_k: int = None
+    query: str, tenant_id: int, session: AsyncSession, top_k: int = None
 ) -> List[Tuple[str, int, str]]:
     """
     Retrieve most relevant chunks for a query using vector similarity
@@ -53,12 +50,7 @@ async def retrieve_relevant_chunks(
     """)
 
     result = await session.execute(
-        query_sql,
-        {
-            "embedding": embedding_str,
-            "tenant_id": tenant_id,
-            "limit": top_k
-        }
+        query_sql, {"embedding": embedding_str, "tenant_id": tenant_id, "limit": top_k}
     )
 
     rows = result.fetchall()

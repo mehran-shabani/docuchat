@@ -10,10 +10,7 @@ settings = get_settings()
 
 
 def chunk_text(
-    text: str,
-    page_num: int,
-    chunk_size: int = None,
-    overlap: int = None
+    text: str, page_num: int, chunk_size: int = None, overlap: int = None
 ) -> List[Tuple[int, str]]:
     """
     Chunk text into smaller pieces based on token count

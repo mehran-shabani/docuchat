@@ -15,12 +15,14 @@ async def setup_pgvector() -> None:
         # Create ivfflat index on chunks.embedding for faster similarity search
         # Note: Index is created after tables exist
         try:
-            await conn.execute(text("""
+            await conn.execute(
+                text("""
                 CREATE INDEX IF NOT EXISTS chunks_embedding_idx
                 ON chunks
                 USING ivfflat (embedding vector_cosine_ops)
                 WITH (lists = 100)
-            """))
+            """)
+            )
         except Exception as e:
             # Index might already exist or table might not exist yet
             print(f"Index creation skipped: {e}")
@@ -39,9 +41,7 @@ async def create_default_tenant(session: AsyncSession) -> int:
     from app.models.tenant import Tenant
 
     # Check if default tenant exists
-    result = await session.execute(
-        text("SELECT id FROM tenants WHERE name = 'default' LIMIT 1")
-    )
+    result = await session.execute(text("SELECT id FROM tenants WHERE name = 'default' LIMIT 1"))
     tenant = result.first()
 
     if tenant:

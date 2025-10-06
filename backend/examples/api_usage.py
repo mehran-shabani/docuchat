@@ -22,7 +22,7 @@ async def authenticate(email: str) -> str:
         response = await client.post(
             f"{BASE_URL}/v1/auth/request-code",
             json={"email": email},
-            headers={"X-Tenant-ID": TENANT_ID}
+            headers={"X-Tenant-ID": TENANT_ID},
         )
         print(f"Response: {response.json()}")
 
@@ -35,7 +35,7 @@ async def authenticate(email: str) -> str:
         response = await client.post(
             f"{BASE_URL}/v1/auth/verify-code",
             json={"email": email, "code": code},
-            headers={"X-Tenant-ID": TENANT_ID}
+            headers={"X-Tenant-ID": TENANT_ID},
         )
 
         if response.status_code == 200:
@@ -59,10 +59,7 @@ async def upload_pdf(token: str, pdf_path: str):
             response = await client.post(
                 f"{BASE_URL}/v1/files",
                 files=files,
-                headers={
-                    "X-Tenant-ID": TENANT_ID,
-                    "Authorization": f"Bearer {token}"
-                }
+                headers={"X-Tenant-ID": TENANT_ID, "Authorization": f"Bearer {token}"},
             )
 
         if response.status_code == 200:
@@ -83,16 +80,11 @@ async def chat_websocket(token: str, message: str):
 
     print("💬 Connecting to chat...")
 
-    async with websockets.connect(
-        uri,
-        extra_headers={"X-Tenant-ID": TENANT_ID}
-    ) as websocket:
+    async with websockets.connect(uri, extra_headers={"X-Tenant-ID": TENANT_ID}) as websocket:
         print("✅ Connected!")
 
         # Send message
-        await websocket.send(json.dumps({
-            "message": message
-        }))
+        await websocket.send(json.dumps({"message": message}))
 
         print("🤖 Assistant: ", end="", flush=True)
 
@@ -124,10 +116,7 @@ async def get_usage(token: str):
 
         response = await client.get(
             f"{BASE_URL}/v1/usage",
-            headers={
-                "X-Tenant-ID": TENANT_ID,
-                "Authorization": f"Bearer {token}"
-            }
+            headers={"X-Tenant-ID": TENANT_ID, "Authorization": f"Bearer {token}"},
         )
 
         if response.status_code == 200:

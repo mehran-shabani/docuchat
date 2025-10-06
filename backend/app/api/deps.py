@@ -18,7 +18,7 @@ security = HTTPBearer()
 
 
 async def get_tenant_id(
-    x_tenant_id: Optional[str] = Header(None, alias=settings.TENANT_HEADER)
+    x_tenant_id: Optional[str] = Header(None, alias=settings.TENANT_HEADER),
 ) -> int:
     """
     Extract and validate tenant ID from header
@@ -34,8 +34,7 @@ async def get_tenant_id(
     """
     if not x_tenant_id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Missing {settings.TENANT_HEADER} header"
+            status_code=status.HTTP_403_FORBIDDEN, detail=f"Missing {settings.TENANT_HEADER} header"
         )
 
     try:
@@ -43,8 +42,7 @@ async def get_tenant_id(
         return tenant_id
     except ValueError:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Invalid {settings.TENANT_HEADER} header"
+            status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid {settings.TENANT_HEADER} header"
         )
 
 
@@ -52,7 +50,7 @@ async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     tenant_id: int = Depends(get_tenant_id),
     session: AsyncSession = Depends(get_session),
-    request: Request = None
+    request: Request = None,
 ) -> dict:
     """
     Get current authenticated user from JWT token
@@ -77,16 +75,12 @@ async def get_current_user(
 
     if not user_id or not token_tenant_id:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token payload"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload"
         )
 
     # Verify tenant matches
     if token_tenant_id != tenant_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Tenant mismatch"
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Tenant mismatch")
 
     # Verify user exists
     result = await session.execute(
@@ -95,24 +89,17 @@ async def get_current_user(
     user = result.scalar_one_or_none()
 
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
 
     # Set user_id in request state for rate limiting
     if request:
         request.state.user_id = user_id
 
-    return {
-        "user_id": user_id,
-        "tenant_id": tenant_id
-    }
+    return {"user_id": user_id, "tenant_id": tenant_id}
 
 
 async def get_tenant(
-    tenant_id: int = Depends(get_tenant_id),
-    session: AsyncSession = Depends(get_session)
+    tenant_id: int = Depends(get_tenant_id), session: AsyncSession = Depends(get_session)
 ) -> Tenant:
     """
     Get tenant by ID
@@ -127,15 +114,10 @@ async def get_tenant(
     Raises:
         HTTPException: If tenant not found
     """
-    result = await session.execute(
-        select(Tenant).where(Tenant.id == tenant_id)
-    )
+    result = await session.execute(select(Tenant).where(Tenant.id == tenant_id))
     tenant = result.scalar_one_or_none()
 
     if not tenant:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Tenant not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tenant not found")
 
     return tenant

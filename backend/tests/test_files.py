@@ -12,15 +12,9 @@ from app.models.user import User
 
 
 @pytest.mark.asyncio
-async def test_upload_pdf_unauthorized(
-    client: AsyncClient,
-    tenant_headers: dict
-):
+async def test_upload_pdf_unauthorized(client: AsyncClient, tenant_headers: dict):
     """Test upload without authentication"""
-    response = await client.post(
-        "/v1/files",
-        headers=tenant_headers
-    )
+    response = await client.post("/v1/files", headers=tenant_headers)
 
     # Should return 403 (missing auth) or 422 (missing file)
     assert response.status_code in [403, 422]
@@ -28,9 +22,7 @@ async def test_upload_pdf_unauthorized(
 
 @pytest.mark.asyncio
 async def test_upload_invalid_file_type(
-    client: AsyncClient,
-    db_session: AsyncSession,
-    tenant_headers: dict
+    client: AsyncClient, db_session: AsyncSession, tenant_headers: dict
 ):
     """Test upload with non-PDF file"""
     # Create tenant and user
@@ -47,16 +39,9 @@ async def test_upload_invalid_file_type(
 
     # Try to upload non-PDF
     files = {"file": ("test.txt", BytesIO(b"test content"), "text/plain")}
-    headers = {
-        **tenant_headers,
-        "Authorization": f"Bearer {token}"
-    }
+    headers = {**tenant_headers, "Authorization": f"Bearer {token}"}
 
-    response = await client.post(
-        "/v1/files",
-        files=files,
-        headers=headers
-    )
+    response = await client.post("/v1/files", files=files, headers=headers)
 
     assert response.status_code == 400
     assert "PDF" in response.json()["detail"]

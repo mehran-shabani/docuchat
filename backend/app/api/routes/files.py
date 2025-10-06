@@ -29,12 +29,7 @@ settings = get_settings()
 router = APIRouter()
 
 
-async def process_pdf_file(
-    file_bytes: bytes,
-    title: str,
-    tenant_id: int,
-    document_id: int
-):
+async def process_pdf_file(file_bytes: bytes, title: str, tenant_id: int, document_id: int):
     """
     Background task to process PDF file
 
@@ -64,10 +59,7 @@ async def process_pdf_file(
             # Save chunks to database
             for (page_num, text_content), embedding in zip(all_chunks, embeddings):
                 chunk = Chunk(
-                    document_id=document_id,
-                    page=page_num,
-                    text=text_content,
-                    embedding=embedding
+                    document_id=document_id, page=page_num, text=text_content, embedding=embedding
                 )
                 session.add(chunk)
 
@@ -84,7 +76,7 @@ async def upload_file(
     file: UploadFile = File(...),
     title: Optional[str] = Form(None),
     current_user: dict = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session),
 ):
     """
     Upload a PDF file and process it for RAG
@@ -94,10 +86,9 @@ async def upload_file(
     start_time = time.time()
 
     # Validate file type
-    if not file.filename.endswith('.pdf'):
+    if not file.filename.endswith(".pdf"):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Only PDF files are allowed"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Only PDF files are allowed"
         )
 
     # Read file content
@@ -108,7 +99,7 @@ async def upload_file(
     if file_size_mb > settings.MAX_FILE_SIZE_MB:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail=f"File size {file_size_mb:.2f}MB exceeds maximum {settings.MAX_FILE_SIZE_MB}MB"
+            detail=f"File size {file_size_mb:.2f}MB exceeds maximum {settings.MAX_FILE_SIZE_MB}MB",
         )
 
     # Use filename as title if not provided
@@ -123,23 +114,13 @@ async def upload_file(
         num_pages = len(pages_text)
 
         # Create document record
-        document = Document(
-            tenant_id=tenant_id,
-            title=title,
-            pages=num_pages
-        )
+        document = Document(tenant_id=tenant_id, title=title, pages=num_pages)
         session.add(document)
         await session.commit()
         await session.refresh(document)
 
         # Process in background
-        background_tasks.add_task(
-            process_pdf_file,
-            file_bytes,
-            title,
-            tenant_id,
-            document.id
-        )
+        background_tasks.add_task(process_pdf_file, file_bytes, title, tenant_id, document.id)
 
         elapsed_ms = (time.time() - start_time) * 1000
 
@@ -148,16 +129,13 @@ async def upload_file(
         return UploadOut(
             document_id=document.id,
             chunks=0,  # Will be updated in background
-            elapsed_ms=elapsed_ms
+            elapsed_ms=elapsed_ms,
         )
 
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to process file: {str(e)}"
+            detail=f"Failed to process file: {str(e)}",
         )

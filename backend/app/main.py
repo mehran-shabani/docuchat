@@ -41,7 +41,7 @@ app = FastAPI(
     title="DocuChat API",
     description="Multi-tenant FastAPI backend with OpenAI RAG",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Add rate limiter
@@ -63,10 +63,7 @@ app.add_middleware(
 async def global_exception_handler(request: Request, exc: Exception):
     """Global exception handler"""
     print(f"[ERROR] {type(exc).__name__}: {str(exc)}")
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "Internal server error"}
-    )
+    return JSONResponse(status_code=500, content={"detail": "Internal server error"})
 
 
 # Include API routes
@@ -80,18 +77,10 @@ app.websocket("/ws/chat")(websocket_chat_handler)
 @app.get("/")
 async def root():
     """Root endpoint"""
-    return {
-        "name": "DocuChat API",
-        "version": "1.0.0",
-        "status": "running"
-    }
+    return {"name": "DocuChat API", "version": "1.0.0", "status": "running"}
 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(
-        "app.main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True
-    )
+
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)

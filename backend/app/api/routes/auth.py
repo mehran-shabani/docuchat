@@ -22,10 +22,7 @@ redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
 
 
 @router.post("/request-code", status_code=status.HTTP_200_OK)
-async def request_verification_code(
-    data: EmailRequestIn,
-    tenant_id: int = Depends(get_tenant_id)
-):
+async def request_verification_code(data: EmailRequestIn, tenant_id: int = Depends(get_tenant_id)):
     """
     Request a verification code for email
 
@@ -36,11 +33,7 @@ async def request_verification_code(
 
     # Store in Redis with TTL
     key = f"{tenant_id}:{data.email}"
-    await redis_client.setex(
-        key,
-        settings.VERIFICATION_CODE_TTL_SECONDS,
-        code
-    )
+    await redis_client.setex(key, settings.VERIFICATION_CODE_TTL_SECONDS, code)
 
     # TODO: Send email in production
     # For PoC, just log it
@@ -53,7 +46,7 @@ async def request_verification_code(
 async def verify_code(
     data: VerifyCodeIn,
     tenant_id: int = Depends(get_tenant_id),
-    session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session),
 ):
     """
     Verify code and issue JWT token
@@ -66,14 +59,12 @@ async def verify_code(
 
     if not stored_code:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Verification code expired or not found"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Verification code expired or not found"
         )
 
     if stored_code != data.code:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid verification code"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid verification code"
         )
 
     # Delete code from Redis (one-time use)
@@ -81,28 +72,19 @@ async def verify_code(
 
     # Find or create user
     result = await session.execute(
-        select(User)
-        .where(User.email == data.email)
-        .where(User.tenant_id == tenant_id)
+        select(User).where(User.email == data.email).where(User.tenant_id == tenant_id)
     )
     user = result.scalar_one_or_none()
 
     if not user:
         # Create new user
-        user = User(
-            email=data.email,
-            tenant_id=tenant_id
-        )
+        user = User(email=data.email, tenant_id=tenant_id)
         session.add(user)
         await session.commit()
         await session.refresh(user)
 
     # Create JWT token
-    token_data = {
-        "sub": user.id,
-        "tenant_id": tenant_id,
-        "email": user.email
-    }
+    token_data = {"sub": user.id, "tenant_id": tenant_id, "email": user.email}
     access_token = create_access_token(token_data)
 
     return TokenOut(access_token=access_token)
