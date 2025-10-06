@@ -112,7 +112,7 @@ curl -H "X-Tenant-ID: 1" http://localhost:8000/healthz
 
 ## Authentication Flow
 
-1. Request verification code:
+### Step 1: Request verification code
 
 ```bash
 curl -X POST http://localhost:8000/v1/auth/request-code \
@@ -121,9 +121,11 @@ curl -X POST http://localhost:8000/v1/auth/request-code \
   -d '{"email": "user@example.com"}'
 ```
 
-2. Check server logs for the code (in production, this would be sent via email)
+### Step 2: Check server logs
 
-3. Verify code:
+Check server logs for the code (in production, this would be sent via email)
+
+### Step 3: Verify code
 
 ```bash
 curl -X POST http://localhost:8000/v1/auth/verify-code \
@@ -132,7 +134,7 @@ curl -X POST http://localhost:8000/v1/auth/verify-code \
   -d '{"email": "user@example.com", "code": "123456"}'
 ```
 
-4. Use the returned JWT token in subsequent requests:
+### Step 4: Use the JWT token
 
 ```bash
 curl http://localhost:8000/v1/usage \

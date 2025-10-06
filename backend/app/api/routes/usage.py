@@ -3,8 +3,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.session import get_session
 from app.api.deps import get_current_user
+from app.db.session import get_session
 from app.schemas.usage import UsageOut, UsageWindow
 from app.services.tokens_meter import get_usage_stats
 
@@ -18,7 +18,7 @@ async def get_usage(
 ):
     """
     Get token usage statistics for current user
-    
+
     Returns usage for 24h and 7d windows
     """
     stats = await get_usage_stats(
