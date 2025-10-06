@@ -1,0 +1,39 @@
+export interface Message {
+  id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp: Date;
+  streaming?: boolean;
+}
+
+export interface ChatRequest {
+  message: string;
+  model?: string;
+  conversationId?: string;
+}
+
+export interface ChatResponse {
+  response: string;
+  conversationId?: string;
+  model?: string;
+}
+
+export interface WebSocketMessage {
+  type: 'token' | 'end' | 'error';
+  content?: string;
+  error?: string;
+}
+
+export type OpenAIModel = 'gpt-3.5-turbo' | 'gpt-4o' | 'gpt-4o-mini';
+
+export const ALLOWED_OPENAI_MODELS: OpenAIModel[] = [
+  'gpt-3.5-turbo',
+  'gpt-4o',
+  'gpt-4o-mini',
+];
+
+export interface FeatureFlags {
+  enableWs: boolean;
+  enablePdfUpload: boolean;
+  enableTeamSharing: boolean;
+}
