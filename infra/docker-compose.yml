@@ -47,6 +47,7 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+
     # For development, use volume mount
     # volumes:
     #   - ../frontend:/app
