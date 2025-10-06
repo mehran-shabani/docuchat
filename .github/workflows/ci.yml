@@ -82,7 +82,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 10
       
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -96,6 +96,9 @@ jobs:
       
       - name: Run ESLint
         run: pnpm lint
+      
+      - name: Run tests
+        run: pnpm test
 
   build-backend:
     name: Build Backend Image
