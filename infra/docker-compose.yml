@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  postgres:
+  db:
     image: pgvector/pgvector:pg16
-    container_name: docuchat-postgres
+    container_name: docuchat-db
     environment:
       POSTGRES_DB: docuchat
       POSTGRES_USER: docuchat
@@ -19,18 +19,34 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: docuchat-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ../backend
       dockerfile: Dockerfile
     container_name: docuchat-backend
     environment:
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      DATABASE_URL: postgresql://docuchat:docuchat_pass@postgres:5432/docuchat
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-sk-test}
+      DATABASE_URL: postgresql+asyncpg://docuchat:docuchat_pass@db:5432/docuchat
+      REDIS_URL: redis://redis:6379/0
+      FRONTEND_ORIGIN: http://localhost:3000
+      JWT_SECRET: dev-secret-change-in-production
     ports:
       - "8000:8000"
     depends_on:
-      postgres:
+      db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     volumes:
       - ../backend:/app

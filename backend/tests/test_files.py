@@ -1,0 +1,42 @@
+"""Tests for file upload endpoint"""
+
+from io import BytesIO
+
+import pytest
+from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models.tenant import Tenant
+from app.models.user import User
+
+
+@pytest.mark.asyncio
+async def test_upload_pdf_unauthorized(client: AsyncClient, tenant_headers: dict):
+    """Test upload without authentication"""
+    response = await client.post("/v1/files", headers=tenant_headers)
+
+    # Should return 403 (missing auth) or 422 (missing file)
+    assert response.status_code in [403, 422]
+
+
+@pytest.mark.asyncio
+async def test_upload_invalid_file_type(
+    authenticated_client: AsyncClient, db_session: AsyncSession, tenant_headers: dict
+):
+    """Test upload with non-PDF file"""
+    # Create tenant and user
+    tenant = Tenant(id=1, name="test")
+    db_session.add(tenant)
+    await db_session.commit()
+
+    user = User(id=1, email="test@example.com", tenant_id=1)
+    db_session.add(user)
+    await db_session.commit()
+
+    # Try to upload non-PDF (authentication is mocked in fixture)
+    files = {"file": ("test.txt", BytesIO(b"test content"), "text/plain")}
+
+    response = await authenticated_client.post("/v1/files", files=files, headers=tenant_headers)
+
+    assert response.status_code == 400
+    assert "PDF" in response.json()["detail"]
