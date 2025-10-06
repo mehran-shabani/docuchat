@@ -4,7 +4,7 @@
 
 ## ساختار
 
-```
+```text
 infra/
 ├── docker-compose.yml          # محیط توسعه محلی
 ├── chart/                      # Helm chart برای Kubernetes
@@ -55,10 +55,11 @@ docker-compose logs -f
 ```
 
 **سرویس‌های در دسترس:**
-- Frontend: http://localhost:3000
-- Backend: http://localhost:8000
-- Prometheus: http://localhost:9090
-- Grafana: http://localhost:3001 (admin/admin)
+
+- Frontend: <http://localhost:3000>
+- Backend: <http://localhost:8000>
+- Prometheus: <http://localhost:9090>
+- Grafana: <http://localhost:3001> (admin/admin)
 
 ### Kubernetes (Production)
 
@@ -141,9 +142,10 @@ resources:
 
 ### Prometheus
 
-**Metrics endpoint:** http://localhost:8000/api/v1/metrics
+**Metrics endpoint:** <http://localhost:8000/api/v1/metrics>
 
-**Kلیدی‌ترین متریک‌ها:**
+**کلیدی‌ترین متریک‌ها:**
+
 - `openai_tokens_total` - مصرف توکن OpenAI
 - `ml_fallback_total` - تعداد fallback بین مدل‌ها
 - `http_request_duration_seconds` - زمان پاسخ HTTP
@@ -155,8 +157,9 @@ resources:
 2. **Token Usage & Billing** - مصرف توکن و هزینه‌ها
 
 **دسترسی:**
-- محیط محلی: http://localhost:3001
-- Production: https://grafana.docuchat.example.com
+
+- محیط محلی: <http://localhost:3001>
+- Production: <https://grafana.docuchat.example.com>
 
 ## Billing
 

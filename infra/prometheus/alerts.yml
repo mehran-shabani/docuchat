@@ -5,9 +5,9 @@ groups:
       # High error rate
       - alert: HighErrorRate
         expr: |
-          rate(http_request_duration_seconds_count{status=~"5.."}[5m]) 
-          / 
-          rate(http_request_duration_seconds_count[5m]) 
+          rate(http_request_duration_seconds_count{status=~"5.."}[5m])
+          /
+          rate(http_request_duration_seconds_count[5m])
           > 0.05
         for: 5m
         labels:
@@ -86,10 +86,12 @@ groups:
       # High CPU usage
       - alert: HighCPUUsage
         expr: |
-          rate(container_cpu_usage_seconds_total{pod=~"docuchat-.*"}[5m]) 
-          / 
-          container_spec_cpu_quota{pod=~"docuchat-.*"} 
-          * 100000 
+          (rate(container_cpu_usage_seconds_total{pod=~"docuchat-.*"}[5m])
+          /
+          (container_spec_cpu_quota{pod=~"docuchat-.*"}
+          /
+          container_spec_cpu_period{pod=~"docuchat-.*"}))
+          * 100
           > 90
         for: 5m
         labels:

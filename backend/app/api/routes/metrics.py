@@ -23,7 +23,9 @@ openai_tokens_total = Counter(
 )
 
 ml_fallback_total = Counter(
-    "ml_fallback_total", "Total ML model fallbacks", ["from_model", "to_model", "tenant"]
+    "ml_fallback_total",
+    "Total ML model fallbacks",
+    ["from_model", "to_model", "tenant"],
 )
 
 http_request_duration_seconds = Histogram(
@@ -45,11 +47,15 @@ openai_request_duration_seconds = Histogram(
 )
 
 rag_query_total = Counter(
-    "rag_query_total", "Total RAG queries processed", ["tenant", "model"]
+    "rag_query_total",
+    "Total RAG queries processed",
+    ["tenant", "model"],
 )
 
 document_chunks_total = Counter(
-    "document_chunks_total", "Total document chunks stored", ["tenant"]
+    "document_chunks_total",
+    "Total document chunks stored",
+    ["tenant"],
 )
 
 

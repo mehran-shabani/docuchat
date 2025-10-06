@@ -24,7 +24,7 @@ jobs:
     name: Deploy to Kubernetes
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment || 'production' }}
-    
+
     permissions:
       contents: read
       packages: read
@@ -113,10 +113,10 @@ jobs:
         run: |
           echo "=== Backend Pods ==="
           kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=docuchat-backend
-          
+
           echo "=== Frontend Pods ==="
           kubectl get pods -n ${{ env.K8S_NAMESPACE }} -l app=docuchat-frontend
-          
+
           echo "=== All Services ==="
           kubectl get svc -n ${{ env.K8S_NAMESPACE }}
 
@@ -124,7 +124,7 @@ jobs:
         run: |
           # Get backend service endpoint
           BACKEND_URL=$(kubectl get svc docuchat-backend -n ${{ env.K8S_NAMESPACE }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-          
+
           if [ -z "$BACKEND_URL" ]; then
             # Use port-forward if LoadBalancer is not available
             echo "Using port-forward for smoke tests"
@@ -133,15 +133,15 @@ jobs:
             sleep 5
             BACKEND_URL="localhost:8000"
           fi
-          
+
           # Test health endpoint
           echo "Testing health endpoint..."
           curl -f http://${BACKEND_URL}/api/v1/health || exit 1
-          
+
           # Test metrics endpoint
           echo "Testing metrics endpoint..."
           curl -f http://${BACKEND_URL}/api/v1/metrics || exit 1
-          
+
           # Cleanup port-forward if used
           if [ ! -z "$PF_PID" ]; then
             kill $PF_PID
@@ -157,7 +157,7 @@ jobs:
           echo "- **Backend Tag:** ${{ steps.set-tags.outputs.backend_tag }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Frontend Tag:** ${{ steps.set-tags.outputs.frontend_tag }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ "${{ job.status }}" == "success" ]; then
             echo "✅ **Deployment successful!**" >> $GITHUB_STEP_SUMMARY
           else

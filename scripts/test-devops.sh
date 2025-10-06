@@ -155,11 +155,7 @@ echo "📊 Test Summary"
 echo "==========================================="
 echo ""
 
-# Count checks
-TOTAL_CHECKS=0
-PASSED_CHECKS=0
-
-# Simple summary - you can extend this
+# Simple summary
 echo "Core services:"
 curl -sf http://localhost:8000/api/v1/health > /dev/null 2>&1 && echo -e "${GREEN}  ✅ Backend API${NC}" || echo -e "${RED}  ❌ Backend API${NC}"
 curl -sf http://localhost:8000/api/v1/metrics > /dev/null 2>&1 && echo -e "${GREEN}  ✅ Metrics endpoint${NC}" || echo -e "${RED}  ❌ Metrics endpoint${NC}"

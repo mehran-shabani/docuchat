@@ -41,7 +41,9 @@ async def record_token_usage(
 
     # Record metrics for Prometheus
     tenant_str = str(tenant_id)
-    openai_tokens_total.labels(tenant=tenant_str, direction="in", model=model).inc(tokens_in)
+    openai_tokens_total.labels(tenant=tenant_str, direction="in", model=model).inc(
+        tokens_in
+    )
     openai_tokens_total.labels(tenant=tenant_str, direction="out", model=model).inc(
         tokens_out
     )
