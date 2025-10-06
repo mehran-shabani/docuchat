@@ -1,0 +1,8 @@
+Fixed Markdown Linting Issues in infra/README.md:
+
+1. Line 173: Added blank line before numbered list after "**عملکرد:**"
+2. Line 302: Added blank line before list and wrapped email addresses
+3. Line 302: Wrapped devops@docuchat.io in angle brackets
+4. Line 303: Wrapped oncall@docuchat.io in angle brackets
+
+All MD032/blanks-around-lists and MD034/no-bare-urls errors are now resolved.

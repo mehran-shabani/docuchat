@@ -170,6 +170,7 @@ schedule: "0 3 * * *"  # هر روز ساعت 3 صبح
 ```
 
 **عملکرد:**
+
 1. کوئری Prometheus برای مصرف توکن
 2. محاسبه هزینه (20 تومان / 1000 توکن)
 3. ایجاد رکورد در جدول `tenant_invoice`
@@ -299,8 +300,9 @@ kubectl port-forward svc/postgresql 5432:5432 -n docuchat-prod
 برای راهنمای کامل، به [docs/fa/devops-guide.md](../docs/fa/devops-guide.md) مراجعه کنید.
 
 **تماس:**
-- DevOps Team: devops@docuchat.io
-- On-call: oncall@docuchat.io
+
+- DevOps Team: <devops@docuchat.io>
+- On-call: <oncall@docuchat.io>
 
 ## مجوز
 
