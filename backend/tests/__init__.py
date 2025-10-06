@@ -1,1 +1,1 @@
-# Test package
+"""Tests for DocuChat backend"""
