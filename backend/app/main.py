@@ -1,7 +1,7 @@
 """FastAPI application main entry point"""
 
-from contextlib import asynccontextmanager
 import os
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,9 +23,9 @@ settings = get_settings()
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown"""
     # Startup
-    should_skip_startup = os.getenv("DISABLE_STARTUP_INIT") == "1" or settings.DATABASE_URL.startswith(
-        "sqlite"
-    )
+    should_skip_startup = os.getenv(
+        "DISABLE_STARTUP_INIT"
+    ) == "1" or settings.DATABASE_URL.startswith("sqlite")
     if should_skip_startup:
         print("[STARTUP] Skipping DB init (test/SQLite mode)")
     else:

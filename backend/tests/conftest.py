@@ -1,7 +1,7 @@
 """Pytest configuration and fixtures"""
 
-from typing import AsyncGenerator
 import os
+from typing import AsyncGenerator
 
 import pytest
 import pytest_asyncio
@@ -37,8 +37,9 @@ def fake_redis(monkeypatch):
     # Ensure app startup does not hit Postgres/pgvector during tests
     monkeypatch.setenv("DISABLE_STARTUP_INIT", "1")
 
-    from app.api.routes import auth as auth_module
     import redis.asyncio as redis_module
+
+    from app.api.routes import auth as auth_module
 
     shared_store: dict[str, str] = {}
 
@@ -71,10 +72,10 @@ def fake_redis(monkeypatch):
 @pytest_asyncio.fixture
 async def db_session() -> AsyncGenerator[AsyncSession, None]:
     """Provide a test database session"""
-    from app.models.tenant import Tenant
-    from app.models.user import User
     from app.models.document import Document
     from app.models.quota import Quota
+    from app.models.tenant import Tenant
+    from app.models.user import User
 
     async with test_engine.begin() as conn:
         # Only attempt pgvector extension on PostgreSQL
@@ -101,6 +102,7 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
 
     # Clean up only the created tables after test
     async with test_engine.begin() as conn:
+
         def _drop_all(connection):
             SQLModel.metadata.drop_all(
                 bind=connection,
