@@ -1,0 +1,17 @@
+apiVersion: v2
+name: docuchat
+description: A Helm chart for DocuChat - AI-powered document chat application
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+
+keywords:
+  - docuchat
+  - fastapi
+  - nextjs
+  - openai
+  - pgvector
+
+maintainers:
+  - name: DocuChat Team
+    email: team@docuchat.example.com

@@ -1,0 +1,72 @@
+replicaCount: 1
+
+backend:
+  image:
+    repository: ghcr.io/your-org/docuchat-backend
+    pullPolicy: IfNotPresent
+    tag: "0.1.0"
+  
+  service:
+    type: ClusterIP
+    port: 8000
+  
+  env:
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: docuchat-secrets
+          key: database-url
+    - name: OPENAI_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: docuchat-secrets
+          key: openai-api-key
+
+frontend:
+  image:
+    repository: ghcr.io/your-org/docuchat-frontend
+    pullPolicy: IfNotPresent
+    tag: "0.1.0"
+  
+  service:
+    type: LoadBalancer
+    port: 3000
+
+postgres:
+  enabled: true
+  image:
+    repository: pgvector/pgvector
+    tag: pg16
+  auth:
+    database: docuchat
+    username: docuchat
+    existingSecret: docuchat-secrets
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: docuchat.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
