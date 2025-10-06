@@ -9,7 +9,6 @@ import json
 import httpx
 import websockets
 
-
 BASE_URL = "http://localhost:8000"
 TENANT_ID = "1"
 
