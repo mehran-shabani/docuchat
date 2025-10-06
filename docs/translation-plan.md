@@ -1,6 +1,7 @@
 # DocuChat Translation Plan
 
 ## Overview
+
 This document outlines the translation strategy for DocuChat documentation from English to Persian (Farsi) and vice versa. All documentation should be maintained in both languages to ensure accessibility for both audiences.
 
 ## Translation Status
