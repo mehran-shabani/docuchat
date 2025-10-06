@@ -8,7 +8,7 @@ from httpx import AsyncClient
 async def test_health_check(client: AsyncClient):
     """Test health check endpoint"""
     response = await client.get("/healthz")
-    
+
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
@@ -17,7 +17,7 @@ async def test_health_check(client: AsyncClient):
 async def test_root_endpoint(client: AsyncClient):
     """Test root endpoint"""
     response = await client.get("/")
-    
+
     assert response.status_code == 200
     data = response.json()
     assert data["name"] == "DocuChat API"

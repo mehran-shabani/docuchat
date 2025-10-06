@@ -1,16 +1,17 @@
 """Pytest configuration and fixtures"""
 
+from typing import AsyncGenerator
+
 import pytest
 import pytest_asyncio
-from typing import AsyncGenerator
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel
 
-from app.main import app
-from app.db.session import get_session
 from app.core.config import get_settings
+from app.db.session import get_session
+from app.main import app
 
 settings = get_settings()
 
@@ -34,11 +35,11 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
         await conn.execute("CREATE EXTENSION IF NOT EXISTS vector")
         # Create all tables
         await conn.run_sync(SQLModel.metadata.create_all)
-    
+
     async with test_session_maker() as session:
         yield session
         await session.rollback()
-    
+
     # Clean up tables after test
     async with test_engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.drop_all)
@@ -47,15 +48,15 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
 @pytest_asyncio.fixture
 async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     """Provide a test HTTP client"""
-    
+
     async def override_get_session():
         yield db_session
-    
+
     app.dependency_overrides[get_session] = override_get_session
-    
+
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
-    
+
     app.dependency_overrides.clear()
 
 

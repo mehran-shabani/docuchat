@@ -87,30 +87,30 @@ async def chat_websocket(token: str, message: str):
         uri,
         extra_headers={"X-Tenant-ID": TENANT_ID}
     ) as websocket:
-        print(f"✅ Connected!")
-        
+        print("✅ Connected!")
+
         # Send message
         await websocket.send(json.dumps({
             "message": message
         }))
-        
-        print(f"🤖 Assistant: ", end="", flush=True)
-        
+
+        print("🤖 Assistant: ", end="", flush=True)
+
         # Receive streaming response
         async for response in websocket:
             data = json.loads(response)
-            
+
             if data["type"] == "start":
                 print(f"\n[Session {data['session_id']}]")
-                print(f"🤖 Assistant: ", end="", flush=True)
-            
+                print("🤖 Assistant: ", end="", flush=True)
+
             elif data["type"] == "delta":
                 print(data["token"], end="", flush=True)
-            
+
             elif data["type"] == "end":
                 print(f"\n\n📊 Usage: {data['usage']}")
                 break
-            
+
             elif data["type"] == "error":
                 print(f"\n❌ Error: {data['message']}")
                 break
@@ -118,10 +118,10 @@ async def chat_websocket(token: str, message: str):
 
 async def get_usage(token: str):
     """Get usage statistics"""
-    
+
     async with httpx.AsyncClient() as client:
-        print(f"📊 Fetching usage statistics...")
-        
+        print("📊 Fetching usage statistics...")
+
         response = await client.get(
             f"{BASE_URL}/v1/usage",
             headers={
@@ -129,10 +129,10 @@ async def get_usage(token: str):
                 "Authorization": f"Bearer {token}"
             }
         )
-        
+
         if response.status_code == 200:
             data = response.json()
-            print(f"✅ Usage statistics:")
+            print("✅ Usage statistics:")
             print(f"   24h: {data['window_24h']}")
             print(f"   7d:  {data['window_7d']}")
         else:
@@ -141,36 +141,36 @@ async def get_usage(token: str):
 
 async def main():
     """Main example flow"""
-    
+
     print("=" * 50)
     print("DocuChat API Usage Example")
     print("=" * 50)
     print()
-    
+
     # Step 1: Authenticate
     email = input("Enter your email: ")
     token = await authenticate(email)
-    
+
     if not token:
         return
-    
+
     print()
-    
+
     # Step 2: Upload PDF (optional)
     upload = input("Do you want to upload a PDF? (y/n): ")
     if upload.lower() == "y":
         pdf_path = input("Enter PDF path: ")
         await upload_pdf(token, pdf_path)
         print()
-    
+
     # Step 3: Chat
     while True:
         message = input("\nYour question (or 'quit' to exit): ")
         if message.lower() == "quit":
             break
-        
+
         await chat_websocket(token, message)
-    
+
     # Step 4: Get usage stats
     print()
     await get_usage(token)

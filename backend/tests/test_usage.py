@@ -4,10 +4,10 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import create_access_token
+from app.models.quota import Quota
 from app.models.tenant import Tenant
 from app.models.user import User
-from app.models.quota import Quota
-from app.core.security import create_access_token
 
 
 @pytest.mark.asyncio
@@ -20,7 +20,7 @@ async def test_get_usage_unauthorized(
         "/v1/usage",
         headers=tenant_headers
     )
-    
+
     assert response.status_code == 403
 
 
@@ -35,19 +35,19 @@ async def test_get_usage_empty(
     tenant = Tenant(id=1, name="test")
     db_session.add(tenant)
     await db_session.commit()
-    
+
     user = User(id=1, email="test@example.com", tenant_id=1)
     db_session.add(user)
     await db_session.commit()
-    
+
     # Create token
     token = create_access_token({"sub": 1, "tenant_id": 1})
-    
+
     headers = {
         **tenant_headers,
         "Authorization": f"Bearer {token}"
     }
-    
+
     response = await client.get("/v1/usage", headers=headers)
     
     assert response.status_code == 200
@@ -69,11 +69,11 @@ async def test_get_usage_with_data(
     tenant = Tenant(id=1, name="test")
     db_session.add(tenant)
     await db_session.commit()
-    
+
     user = User(id=1, email="test@example.com", tenant_id=1)
     db_session.add(user)
     await db_session.commit()
-    
+
     # Add quota data
     quota = Quota(
         tenant_id=1,
@@ -83,15 +83,15 @@ async def test_get_usage_with_data(
     )
     db_session.add(quota)
     await db_session.commit()
-    
+
     # Create token
     token = create_access_token({"sub": 1, "tenant_id": 1})
-    
+
     headers = {
         **tenant_headers,
         "Authorization": f"Bearer {token}"
     }
-    
+
     response = await client.get("/v1/usage", headers=headers)
     
     assert response.status_code == 200

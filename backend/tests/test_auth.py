@@ -1,12 +1,12 @@
 """Tests for authentication endpoints"""
 
 import pytest
+import redis.asyncio as redis
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
-import redis.asyncio as redis
 
-from app.models.tenant import Tenant
 from app.core.config import get_settings
+from app.models.tenant import Tenant
 
 settings = get_settings()
 
@@ -22,13 +22,13 @@ async def test_request_code(
     tenant = Tenant(id=1, name="test")
     db_session.add(tenant)
     await db_session.commit()
-    
+
     response = await client.post(
         "/v1/auth/request-code",
         json={"email": "test@example.com"},
         headers=tenant_headers
     )
-    
+
     assert response.status_code == 200
     assert "message" in response.json()
 
@@ -44,13 +44,13 @@ async def test_verify_code_invalid(
     tenant = Tenant(id=1, name="test")
     db_session.add(tenant)
     await db_session.commit()
-    
+
     response = await client.post(
         "/v1/auth/verify-code",
         json={"email": "test@example.com", "code": "000000"},
         headers=tenant_headers
     )
-    
+
     assert response.status_code == 400
 
 
@@ -65,7 +65,7 @@ async def test_auth_flow(
     tenant = Tenant(id=1, name="test")
     db_session.add(tenant)
     await db_session.commit()
-    
+
     email = "user@example.com"
     
     # Request code
@@ -78,16 +78,16 @@ async def test_auth_flow(
     # Get code from Redis
     redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
     code = await redis_client.get(f"1:{email}")
-    
+
     assert code is not None
-    
+
     # Verify code
     response = await client.post(
         "/v1/auth/verify-code",
         json={"email": email, "code": code},
         headers=tenant_headers
     )
-    
+
     assert response.status_code == 200
     data = response.json()
     assert "access_token" in data
