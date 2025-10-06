@@ -67,14 +67,14 @@ async def test_auth_flow(
     await db_session.commit()
 
     email = "user@example.com"
-    
+
     # Request code
     await client.post(
         "/v1/auth/request-code",
         json={"email": email},
         headers=tenant_headers
     )
-    
+
     # Get code from Redis
     redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
     code = await redis_client.get(f"1:{email}")
@@ -92,5 +92,5 @@ async def test_auth_flow(
     data = response.json()
     assert "access_token" in data
     assert data["token_type"] == "bearer"
-    
+
     await redis_client.close()

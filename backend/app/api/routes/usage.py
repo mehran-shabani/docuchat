@@ -26,7 +26,7 @@ async def get_usage(
         current_user["tenant_id"],
         current_user["user_id"]
     )
-    
+
     return UsageOut(
         window_24h=UsageWindow(**stats["window_24h"]),
         window_7d=UsageWindow(**stats["window_7d"])

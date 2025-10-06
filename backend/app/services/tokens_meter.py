@@ -1,8 +1,9 @@
 """Token usage metering service"""
 
 from datetime import datetime, timedelta
+
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
 
 from app.models.quota import Quota
 
@@ -16,7 +17,7 @@ async def record_token_usage(
 ) -> None:
     """
     Record token usage in quota table
-    
+
     Args:
         session: Database session
         tenant_id: Tenant ID
@@ -31,7 +32,7 @@ async def record_token_usage(
         tokens_out=tokens_out,
         timestamp=datetime.utcnow()
     )
-    
+
     session.add(quota)
     await session.commit()
 
@@ -43,19 +44,19 @@ async def get_usage_stats(
 ) -> dict:
     """
     Get usage statistics for a user
-    
+
     Args:
         session: Database session
         tenant_id: Tenant ID
         user_id: User ID
-    
+
     Returns:
         Dictionary with usage stats for 24h and 7d windows
     """
     now = datetime.utcnow()
     day_ago = now - timedelta(days=1)
     week_ago = now - timedelta(days=7)
-    
+
     # Query for 24h window
     result_24h = await session.execute(
         select(
@@ -66,9 +67,9 @@ async def get_usage_stats(
         .where(Quota.user_id == user_id)
         .where(Quota.timestamp >= day_ago)
     )
-    
+
     row_24h = result_24h.first()
-    
+
     # Query for 7d window
     result_7d = await session.execute(
         select(
@@ -79,9 +80,9 @@ async def get_usage_stats(
         .where(Quota.user_id == user_id)
         .where(Quota.timestamp >= week_ago)
     )
-    
+
     row_7d = result_7d.first()
-    
+
     return {
         "window_24h": {
             "tokens_in": row_24h[0] or 0,

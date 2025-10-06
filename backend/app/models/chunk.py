@@ -1,15 +1,16 @@
 """Chunk model for document embeddings"""
 
-from typing import Optional, List
-from sqlmodel import Field, SQLModel, Column
+from typing import List, Optional
+
 from pgvector.sqlalchemy import Vector
+from sqlmodel import Column, Field, SQLModel
 
 
 class Chunk(SQLModel, table=True):
     """Chunk model - represents a text chunk with embedding vector"""
-    
+
     __tablename__ = "chunks"
-    
+
     id: Optional[int] = Field(default=None, primary_key=True)
     document_id: int = Field(foreign_key="documents.id", index=True)
     page: int
@@ -18,6 +19,6 @@ class Chunk(SQLModel, table=True):
         default=None,
         sa_column=Column(Vector(1536))
     )
-    
+
     class Config:
         arbitrary_types_allowed = True

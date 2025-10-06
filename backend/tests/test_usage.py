@@ -49,7 +49,7 @@ async def test_get_usage_empty(
     }
 
     response = await client.get("/v1/usage", headers=headers)
-    
+
     assert response.status_code == 200
     data = response.json()
     assert data["window_24h"]["tokens_in"] == 0
@@ -93,7 +93,7 @@ async def test_get_usage_with_data(
     }
 
     response = await client.get("/v1/usage", headers=headers)
-    
+
     assert response.status_code == 200
     data = response.json()
     assert data["window_24h"]["tokens_in"] == 100

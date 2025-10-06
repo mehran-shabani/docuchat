@@ -1,18 +1,19 @@
 """FastAPI application main entry point"""
 
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-
-from app.core.config import get_settings
-from app.db.session import init_db
-from app.db.init import setup_pgvector
-from app.api.routes import api_router
-from app.ws.chat import websocket_chat_handler
-from app.services.ratelimit import limiter
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+
+from app.api.routes import api_router
+from app.core.config import get_settings
+from app.db.init import setup_pgvector
+from app.db.session import init_db
+from app.services.ratelimit import limiter
+from app.ws.chat import websocket_chat_handler
 
 settings = get_settings()
 
@@ -23,14 +24,14 @@ async def lifespan(app: FastAPI):
     # Startup
     print("[STARTUP] Initializing database...")
     await init_db()
-    
+
     print("[STARTUP] Setting up pgvector...")
     await setup_pgvector()
-    
+
     print("[STARTUP] Application ready!")
-    
+
     yield
-    
+
     # Shutdown
     print("[SHUTDOWN] Cleaning up...")
 
