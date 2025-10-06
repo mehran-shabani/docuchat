@@ -24,13 +24,13 @@ export interface WebSocketMessage {
   error?: string;
 }
 
-export type OpenAIModel = 'gpt-3.5-turbo' | 'gpt-4o' | 'gpt-4o-mini';
-
-export const ALLOWED_OPENAI_MODELS: OpenAIModel[] = [
+export const ALLOWED_OPENAI_MODELS = [
   'gpt-3.5-turbo',
   'gpt-4o',
   'gpt-4o-mini',
-];
+] as const;
+
+export type OpenAIModel = typeof ALLOWED_OPENAI_MODELS[number];
 
 export interface FeatureFlags {
   enableWs: boolean;
