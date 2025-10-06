@@ -1,0 +1,192 @@
+## DocuChat Helm Chart Values
+
+## Image configuration
+image:
+  backend:
+    repository: ghcr.io/docuchat/docuchat-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  frontend:
+    repository: ghcr.io/docuchat/docuchat-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+
+## Image pull secrets for private registries
+imagePullSecrets: []
+
+## Replica counts
+replicaCount:
+  backend: 2
+  frontend: 2
+
+## Service configuration
+service:
+  backend:
+    type: ClusterIP
+    port: 8000
+  frontend:
+    type: ClusterIP
+    port: 3000
+
+## Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+  hosts:
+    - host: docuchat.example.com
+      paths:
+        - path: /api
+          pathType: Prefix
+          service: backend
+        - path: /
+          pathType: Prefix
+          service: frontend
+  tls:
+    - secretName: docuchat-tls
+      hosts:
+        - docuchat.example.com
+
+## Resource limits
+resources:
+  backend:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "2000m"
+  frontend:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  prometheus:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+  grafana:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+## Autoscaling configuration
+autoscaling:
+  backend:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  frontend:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+## Secrets (override via --set or external secret management)
+secrets:
+  openaiApiKey: ""
+  zibalApiKey: ""
+  databaseUrl: ""
+  redisUrl: ""
+  jwtSecret: ""
+  grafanaAdminPassword: ""
+
+## PostgreSQL configuration (if using in-cluster database)
+postgresql:
+  enabled: false
+  auth:
+    username: docuchat
+    password: ""
+    database: docuchat
+  image:
+    repository: pgvector/pgvector
+    tag: pg16
+  persistence:
+    size: 20Gi
+
+## Redis configuration (if using in-cluster Redis)
+redis:
+  enabled: false
+  auth:
+    enabled: false
+  master:
+    persistence:
+      size: 2Gi
+
+## Prometheus configuration
+prometheus:
+  enabled: true
+  retention: 30d
+  storageSize: 50Gi
+  scrapeInterval: 30s
+
+## Grafana configuration
+grafana:
+  enabled: true
+  adminUser: admin
+  persistence:
+    enabled: true
+    size: 10Gi
+
+## Billing CronJob configuration
+billing:
+  enabled: true
+  schedule: "0 3 * * *"  # Daily at 3 AM
+  image:
+    repository: python
+    tag: "3.11-slim"
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+## Node selector
+nodeSelector: {}
+
+## Tolerations
+tolerations: []
+
+## Affinity rules
+affinity: {}
+
+## Pod security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+## Security context
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+## Network policy
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+
+## Service monitor for Prometheus Operator
+serviceMonitor:
+  enabled: true
+  interval: 30s
