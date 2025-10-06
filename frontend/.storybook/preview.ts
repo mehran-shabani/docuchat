@@ -25,13 +25,11 @@ const preview: Preview = {
     },
   },
   decorators: [
-    (Story, context) => {
-      return React.createElement(
-        'div',
-        { dir: context.globals.direction },
-        React.createElement(Story)
-      );
-    },
+    (Story, context) => (
+      <div dir={context.globals.direction}>
+        <Story />
+      </div>
+    ),
   ],
 };
 
