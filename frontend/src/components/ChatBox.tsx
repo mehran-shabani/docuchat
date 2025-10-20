@@ -84,7 +84,7 @@ export const ChatBox: React.FC = () => {
                     {t('welcome')}
                   </h2>
                   <p className="text-gray-500">
-                    پیام خود را تایپ کرده و با دستیار هوشمند گفتگو کنید
+                    {t('chatBoxWelcome')}
                   </p>
                 </div>
               </div>
@@ -134,12 +134,12 @@ export const ChatBox: React.FC = () => {
           
           <div className="mt-4 p-4 bg-indigo-50 rounded-lg">
             <h3 className="text-sm font-semibold text-indigo-900 mb-2">
-              راهنما
+              {t('guide')}
             </h3>
             <ul className="text-xs text-indigo-700 space-y-1">
-              <li>• از مدل‌های OpenAI استفاده کنید</li>
-              <li>• پیام‌ها به صورت لحظه‌ای ارسال می‌شوند</li>
-              <li>• برای خط جدید از Shift+Enter استفاده کنید</li>
+              <li>{t('guideModel')}</li>
+              <li>{t('guideRealtime')}</li>
+              <li>{t('guideNewline')}</li>
             </ul>
           </div>
         </aside>
