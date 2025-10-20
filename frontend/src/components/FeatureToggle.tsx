@@ -46,7 +46,7 @@ export const FeatureToggle: React.FC<FeatureToggleProps> = ({ onFlagsChange }) =
         
         {flags.enableTeamSharing && (
           <FeatureItem
-            label="اشتراک‌گذاری تیمی فعال"
+            label={t('teamSharingEnabled')}
             enabled={flags.enableTeamSharing}
             icon="👥"
           />

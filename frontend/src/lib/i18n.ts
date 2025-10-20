@@ -28,6 +28,14 @@ export const faTranslations = {
   wsDisabled: 'استریم وب‌سوکت غیرفعال است',
   pdfUploadEnabled: 'آپلود PDF فعال است',
   pdfUploadDisabled: 'آپلود PDF غیرفعال است',
+  teamSharingEnabled: 'اشتراک‌گذاری تیمی فعال است',
+
+  // ChatBox specific
+  chatBoxWelcome: 'پیام خود را تایپ کرده و با دستیار هوشمند گفتگو کنید',
+  guide: 'راهنما',
+  guideModel: '• از مدل‌های OpenAI استفاده کنید',
+  guideRealtime: '• پیام‌ها به صورت لحظه‌ای ارسال می‌شوند',
+  guideNewline: '• برای خط جدید از Shift+Enter استفاده کنید',
 } as const;
 
 export type TranslationKey = keyof typeof faTranslations;
